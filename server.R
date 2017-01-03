@@ -10,7 +10,7 @@ logfile(loggerServer) <- 'logs/server.log'
 level(loggerServer) <- 'ERROR'
 
 options(stringsAsFactors=F)
-host<-'localhost'
+host<-'127.0.0.1'
 version<-'v15_20140605'
 
 disableActionButton <- function(id,session) {
@@ -82,7 +82,7 @@ shinyServer(function(input, output, session) {
   disableActionButton('loadButton',session)
   fixempty <- function(x) {return(ifelse(is.null(x)||is.na(x)||x==0,'',x))}
   freqprint <- function(x){return(sprintf('%5.4f',as.numeric(x)))}
-  mydb<-dbConnect(MySQL(),user='anonymous',dbname='cigma2',host=host)
+  mydb<-dbConnect(MySQL(),user='batch',password='cigma',dbname='cigma2',host=host)
   rs<-dbSendQuery(mydb,"select table_name,field_name,field_label,variant_report,variant_report_order,analysis_output,analysis_output_order from fields where online_report='Y'")
   f<-fetch(rs,-1)
   fn<-split(f$field_name,f$table_name)
@@ -149,7 +149,7 @@ shinyServer(function(input, output, session) {
     v<-NULL
     if (nchar(gene)>0 && nchar(variation)>3 && grepl('^[cp][.]',variation,perl=T)) {
       # don't bother unless there is a gene selected and at least 4 characters in variation
-      mydb<-dbConnect(MySQL(),user='anonymous',dbname='cigma2',host=host)
+      mydb<-dbConnect(MySQL(),user='batch',password='cigma',dbname='cigma2',host=host)
       if (substr(variation,1,2) == 'c.') {
         rs<-dbSendQuery(mydb,paste(sep="",collapse="",
                                    "select CONCAT(hgvs_cdna,' (',hgvs_prot,')') from main_stable m where m.gene='",gene,
@@ -195,7 +195,7 @@ shinyServer(function(input, output, session) {
   # Reactive function collecting loaded sets
   sesslist <- reactive({
     values$sessionschanged
-    mydb<-dbConnect(MySQL(),user='anonymous',dbname='cigma2',host=host)
+    mydb<-dbConnect(MySQL(),user='batch',password='cigma',dbname='cigma2',host=host)
     rs<-dbSendQuery(mydb,"select investigator_name,session_id,count(*) variations from dogma_batch group by investigator_name,session_id")
     sl<-fetch(rs,-1)
     dbDisconnect(mydb)
@@ -1166,7 +1166,7 @@ shinyServer(function(input, output, session) {
     i<-NULL
     dataset<-NULL
     if (nchar(gene) && nchar(variation)) {
-      mydb<-dbConnect(MySQL(),user='anonymous',dbname='cigma2',host=host)
+      mydb<-dbConnect(MySQL(),user='batch',password='cigma',dbname='cigma2',host=host)
       rs<-dbSendQuery(mydb,paste(sep="",collapse="",
                                  "select m.source,m.gene,m.transcript,rtranscript,hgvs_cdna,hgvs_prot,hgvs_prot_code1,
                 m.altname,varLocation,r.name,varType,codingEffect,hg19_chr,hg19_pos,rsID,
@@ -1906,7 +1906,7 @@ shinyServer(function(input, output, session) {
                   )
                 }
       )
-      mydb<-dbConnect(MySQL(),user='anonymous',dbname='cigma2',host=host)
+      mydb<-dbConnect(MySQL(),user='batch',password='cigma',dbname='cigma2',host=host)
       extra<-lapply(1:length(s),
                     function(y) {
                       return(
@@ -2083,7 +2083,7 @@ shinyServer(function(input, output, session) {
               }
     )
     s<-setNames(s,names(t))
-    mydb<-dbConnect(MySQL(),user='anonymous',dbname='cigma2',host=host)
+    mydb<-dbConnect(MySQL(),user='batch',password='cigma',dbname='cigma2',host=host)
     extra<-lapply(1:length(s),function(x){
                                           debug(loggerServer,paste('trying to run SQL statement:',s[[x]],sep='\n'))
                                           rs<-dbSendQuery(mydb,s[[x]]);
