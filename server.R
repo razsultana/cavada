@@ -7,7 +7,7 @@ library(xtable)
 library(log4r)
 loggerServer <- create.logger()
 logfile(loggerServer) <- 'logs/server.log'
-level(loggerServer) <- 'ERROR'
+level(loggerServer) <- 'INFO'
 
 options(stringsAsFactors=F)
 host<-'localhost'
@@ -39,7 +39,7 @@ sendAlertMessage <- function(mess,session) {
 shinyServer(function(input, output, session) {
   values <- reactiveValues()
   values$batch <- NULL
-  values$sessionid <- gsub(':','',paste(format(Sys.time(), "%d%b%Y_%X"),sep='_'))
+  values$sessionid <- paste(format(Sys.time(), "%d%b%Y_%H%M%S"),sep='_')
   values$iname <- ''
   values$inputFileType <- 'simple'
   # can be 'simple' (sample_id gene variation), 
@@ -271,7 +271,7 @@ shinyServer(function(input, output, session) {
         values$fileRead[inFile$datapath]<-1
         values$batch<-batch
         values$contentType<-'table'
-        values$sessionid <- gsub(':','',paste(format(Sys.time(), "%d%b%Y_%X"),sep='_'))
+        values$sessionid <- paste(format(Sys.time(), "%d%b%Y_%H%M%S"),sep='_')
         enableActionButton('parseButton',session)
         disableActionButton('loadButton',session)
       }
@@ -301,7 +301,7 @@ shinyServer(function(input, output, session) {
         batch[,'variation']=sub(',c.*$','',batch[,'variation'],perl=T)
         values$batch<-batch#[which(grepl('BRCA',batch$gene)),]
         values$contentType<-'table'
-        info(LoggerServer," Parsing done")
+        info(loggerServer," Parsing done")
         progress$set(detail = ' done!', value=10)
         enableActionButton('loadButton',session)
       }
